@@ -3,22 +3,18 @@ using System.Collections;
 
 public class SPINFUSOR : MonoBehaviour {
 
-    public GameObject disc;
-    Rigidbody discBody;
-    private int speed = 70;
+    public Rigidbody discPrefab;
+    public Transform barrelEnd;
 
-    void Start()
-    {
-        discBody = disc.GetComponent<Rigidbody>();
-    }
-
-	// Update is called once per frame
+    // Update is called once per frame
 	void Update () {
-	    if(Input.GetKeyDown(KeyCode.Mouse1))
+	    if(Input.GetButtonDown("Fire1"))
         {
-            //GameObject firedDisc = (GameObject)Instantiate(disc, transform.parent.rotation.eulerAngles, new Quaternion());
-            //firedDisc.transform.position = 
+            Rigidbody discInstance;
+            discInstance = Instantiate(discPrefab, barrelEnd.position, barrelEnd.rotation) as Rigidbody;
+            discInstance.AddForce(barrelEnd.up * -1 * 2000);
+            discInstance.AddTorque(new Vector3(0, 500, 0));
+            //discInstance.AddTorque(new Vector3(0, 0, 50));
         }
-
 	}
 }
