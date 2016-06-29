@@ -8,23 +8,25 @@ public class WeaponManager : MonoBehaviour {
     public Transform barrelEnd;
     public Rigidbody[] projectilePrefabs;
     public GameObject weaponPlacement;
-    public int activeWeapon = 0;
+    public int activeWeapon;
 
     public string[] weaponDirectories = { "SpinfusorPrefab", "RiflePrefab" };
 
     void Start()
     {
         //weaponPlacement.
+        activeWeapon = 1;
         weapons = new Weapon[5];
+        
         weapons[0] = new Spinfusor(projectilePrefabs[0], barrelEnd, 2);
-        weapons[1] = new Rifle(projectilePrefabs[1], barrelEnd, .1f);
-        loadWeapon(0);
+        weapons[1] = new Rifle(projectilePrefabs[1], barrelEnd, .01f);
+        loadWeapon(activeWeapon);
     }
     
     // Update is called once per frame
 	void Update () {
         // dakka
-	    if(Input.GetButton("Fire1") && Weapon.ready)
+        if (Input.GetButton("Fire1") && Weapon.ready)
         {
             weapons[activeWeapon].fire();
             Invoke("readyWeapon", weapons[activeWeapon].cycleSpeed);
@@ -41,23 +43,23 @@ public class WeaponManager : MonoBehaviour {
     {
         if (Input.GetButtonDown("1"))
         {
-            activeWeapon = 1;
+            activeWeapon = 0;
         }
         else if (Input.GetButtonDown("2"))
         {
-            activeWeapon = 2;
+            activeWeapon = 1;
         }
         else if (Input.GetButtonDown("3"))
         {
-            activeWeapon = 3;
+            activeWeapon = 2;
         }
         else if (Input.GetButtonDown("4"))
         {
-            activeWeapon = 4;
+            activeWeapon = 3;
         }
         else if (Input.GetButtonDown("5"))
         {
-            activeWeapon = 5;
+            activeWeapon = 4;
         }
 
         loadWeapon(activeWeapon);
@@ -66,7 +68,8 @@ public class WeaponManager : MonoBehaviour {
     void loadWeapon(int num)
     {
         Mesh m = Resources.Load(weaponDirectories[num], typeof(Mesh)) as Mesh;
-        weaponPlacement.GetComponent<MeshFilter>().mesh = Resources.Load(weaponDirectories[num], typeof(Mesh)) as Mesh;
+        GameObject gun = Resources.Load(weaponDirectories[num]) as GameObject;
+        weaponPlacement.GetComponent<MeshFilter>().sharedMesh = gun.GetComponent<MeshFilter>().sharedMesh;
     }
     
     
@@ -101,7 +104,6 @@ public class WeaponManager : MonoBehaviour {
 
     }
 
-
     class Spinfusor : SingleShotWeapon
     {
         int torque = 500;
@@ -110,7 +112,7 @@ public class WeaponManager : MonoBehaviour {
         {
             barrelEnd = barrel;
             projectilePrefab = prefab;
-            velocity = 2000;
+            velocity = 20;
             this.cycleSpeed = cycleSpeed;
         }
         
@@ -120,8 +122,7 @@ public class WeaponManager : MonoBehaviour {
             
             Rigidbody discInstance;
             discInstance = Instantiate(projectilePrefab, barrelEnd.position, barrelEnd.rotation) as Rigidbody;
-            discInstance.AddForce(barrelEnd.up * -1 * velocity);
-            discInstance.AddTorque(new Vector3(0, torque, 0));
+            discInstance.velocity = barrelEnd.forward * velocity;
         }
     }
 
@@ -131,15 +132,16 @@ public class WeaponManager : MonoBehaviour {
         {
             barrelEnd = barrel;
             projectilePrefab = prefab;
-            velocity = 6000;
+            velocity = 60;
             this.cycleSpeed = cycleSpeed;
         }
 
         public override void fire()
         {
+            base.fire();
             Rigidbody bulletInstance;
             bulletInstance = Instantiate(projectilePrefab, barrelEnd.position, barrelEnd.rotation) as Rigidbody;
-            bulletInstance.AddForce(barrelEnd.forward * velocity);
+            bulletInstance.velocity = barrelEnd.forward * velocity;
         }
     }
 }
