@@ -5,21 +5,21 @@ using System;
 public class WeaponManager : MonoBehaviour {
     
     public Weapon[] weapons;
-    public Transform barrelEnd;
     public Rigidbody[] projectilePrefabs;
     public GameObject weaponPlacement;
-    public int activeWeapon;
+    public Transform[] barrelEnds;
 
+
+    public int activeWeapon = 0;
+    
     public string[] weaponDirectories = { "SpinfusorPrefab", "RiflePrefab" };
 
     void Start()
     {
-        //weaponPlacement.
-        activeWeapon = 1;
         weapons = new Weapon[5];
         
-        weapons[0] = new Spinfusor(projectilePrefabs[0], barrelEnd, 2);
-        weapons[1] = new Rifle(projectilePrefabs[1], barrelEnd, .01f);
+        weapons[0] = new Spinfusor(projectilePrefabs[0], barrelEnds[0], 2);
+        weapons[1] = new Rifle(projectilePrefabs[1], barrelEnds[1], .01f);
         loadWeapon(activeWeapon);
     }
     
@@ -89,22 +89,9 @@ public class WeaponManager : MonoBehaviour {
             ready = true;
         }
     }
+    
 
-    public abstract class SingleShotWeapon : Weapon
-    {
-        public override void fire()
-        {
-            ready = false;
-            
-        }
-    }
-
-    public abstract class MultiFireWeapon : Weapon
-    {
-
-    }
-
-    class Spinfusor : SingleShotWeapon
+    class Spinfusor : Weapon
     {
         int torque = 500;
         
@@ -118,7 +105,7 @@ public class WeaponManager : MonoBehaviour {
         
         public override void fire()
         {
-            base.fire();
+            Weapon.ready = false;
             
             Rigidbody discInstance;
             discInstance = Instantiate(projectilePrefab, barrelEnd.position, barrelEnd.rotation) as Rigidbody;
@@ -126,7 +113,7 @@ public class WeaponManager : MonoBehaviour {
         }
     }
 
-    class Rifle : SingleShotWeapon
+    class Rifle : Weapon
     {
         public Rifle(Rigidbody prefab, Transform barrel, float cycleSpeed)
         {
@@ -138,7 +125,6 @@ public class WeaponManager : MonoBehaviour {
 
         public override void fire()
         {
-            base.fire();
             Rigidbody bulletInstance;
             bulletInstance = Instantiate(projectilePrefab, barrelEnd.position, barrelEnd.rotation) as Rigidbody;
             bulletInstance.velocity = barrelEnd.forward * velocity;
